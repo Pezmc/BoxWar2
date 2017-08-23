@@ -1,0 +1,7 @@
+"boxwar"
+{
+	"base"			"base"
+	"title"			"BoxWar"
+	"maps"			"^bw_"
+	"menusystem"	"1"
+}
