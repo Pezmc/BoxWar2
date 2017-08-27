@@ -24,12 +24,20 @@ PLAYER.UseVMHands			= true		-- Uses viewmodel hands
 -- Prevent 'mod_studio: MOVETYPE_FOLLOW with No Models error.'
 PLAYER.DrawViewModel		= false
 
+function PLAYER:Init() 
+	util.PrecacheModel("models/hunter/plates/plate.mdl")
+	self.Player:SetModel("models/hunter/plates/plate.mdl")
+end
+
 -- Called by spawn and sets loadout
 function PLAYER:Loadout()
 	print('Player Loadout')
 
 	-- No weapons
-    self.Player:Give( "weapon_physcannon" ) --Give them the Gravity Gun
+    self.Player:Give( "weapon_frag" ) --Give them the Gravity Gun
+    self.Player:Give( "weapon_pistol" ) --Give them the Gravity Gun
+    self.Player:Give( "weapon_ar2" ) --Give them the Gravity Gun
+    self.Player:Give( "weapon_357" ) --Give them the Gravity Gun
 end
 
 
@@ -39,12 +47,13 @@ function PLAYER:Spawn()
 
 	BaseClass.Spawn( self )
 
+	self.Player:SetModel("models/hunter/plates/plate.mdl")
 	self.Player:CrosshairDisable()
 	self.Player:ResetHull()
 	self.Player:SetAvoidPlayers(true)
-	self.Player:SetCollisionGroup(COLLISION_GROUP_PASSABLE_DOOR)
+	self.Player:SetCollisionGroup( COLLISION_GROUP_PASSABLE_DOOR )
 	self.Player:SetColor( Color(255, 255, 255, 0))
-	self.Player:SetCustomCollisionCheck(true)
+	--self.Player:SetCustomCollisionCheck(true)
 	self.Player:SetRenderMode( RENDERMODE_NONE )
 	self.Player:SetupHands()
 
@@ -59,6 +68,12 @@ function PLAYER:Spawn()
 	self.Player.BWBoxEntity = ents.Create("player_box")
 	self.Player.BWBoxEntity:SetAngles(self.Player:GetAngles())
 
+	self.Player.BWBoxEntity:SetParent(self.Player)
+	self.Player.BWBoxEntity:SetOwner(self.Player)
+
+	self.Player.BWBoxEntity.health = self.Player:Health()
+	self.Player.BWBoxEntity.max_health = self.Player:GetMaxHealth()
+
 	self.Player.BWBoxEntity:Spawn()
 
 	-- Needs to be after entity is spawned
@@ -66,12 +81,6 @@ function PLAYER:Spawn()
 	local boxMin = self.Player.BWBoxEntity:OBBMins()
 
 	self.Player.BWBoxEntity:SetPos(self.Player:GetPos() + Vector(0, 0, -boxMin.z))
-
-	self.Player.BWBoxEntity:SetParent(self.Player)
-	self.Player.BWBoxEntity:SetOwner(self.Player)
-
-	self.Player.BWBoxEntity.health = self.Player:Health()
-	self.Player.BWBoxEntity.max_health = self.Player:GetMaxHealth()
 
 	-- Calculate new player hull slightly smaller than prop
 	local scaling_factor = 0.9
@@ -81,7 +90,6 @@ function PLAYER:Spawn()
 	
 	self.Player:SetHull(Vector(hull_xy_min, hull_xy_min, 0), Vector(hull_xy_max, hull_xy_max, hull_z))
 	self.Player:SetHullDuck(Vector(hull_xy_min, hull_xy_min, 0), Vector(hull_xy_max, hull_xy_max, hull_z))
-
 end
 
 
@@ -89,13 +97,6 @@ end
 function PLAYER:GetHandsModel()
 	return
 end
-
-
--- Called when a player dies with this PLAYER
---function PLAYER:OnDeath(pl, attacker, dmginfo)
---	self.Player:RemoveProp()
---	self.Player:RemoveClientProp()
---end
 
 -- Register
 player_manager.RegisterClass("Box", PLAYER, "player_default")

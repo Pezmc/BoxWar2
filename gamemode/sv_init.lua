@@ -1,5 +1,7 @@
 include( "sh_init.lua" )
 
+include( "sh_player.lua" )
+
 include( "player_class/player.lua" )
 
 local function PlayerInitialSpawn(pl)
@@ -20,3 +22,8 @@ local function PlayerSpawn(pl)
 	player_manager.SetPlayerClass( pl, "Box" )
 end
 hook.Add( "PlayerSpawn", "bw_on_spawn", PlayerSpawn)
+
+-- Prevent gmod handling player death
+function  GM:DoPlayerDeath( ply, attacker, dmginfo )
+ 	-- DO nothing
+end

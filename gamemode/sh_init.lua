@@ -16,3 +16,8 @@ function GM:CreateTeams()
 	team.SetSpawnPoint(TEAM_BOX, {"info_player_terrorist", "info_player_rebel", "info_player_deathmatch", "info_player_allies"})
 	team.SetClass(TEAM_BOX, { "Box" })
 end
+
+local function PlayerDeath( player, weapon, killer )
+	player:BWKill()
+end
+hook.Add( "PlayerDeath", "BW_PlayerDeath", PlayerDeath )
