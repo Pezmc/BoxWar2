@@ -6,8 +6,8 @@ local PLAYER = {}
 
 PLAYER.DisplayName			= "Box"
 
-PLAYER.WalkSpeed			= 400		-- How fast to move when not running
-PLAYER.RunSpeed				= 600		-- How fast to move when running
+PLAYER.WalkSpeed			= 200		-- How fast to move when not running
+PLAYER.RunSpeed				= 300		-- How fast to move when running
 PLAYER.CrouchedWalkSpeed	= 0.3		-- Multiply move speed by this when crouching
 PLAYER.DuckSpeed			= 0.3		-- How fast to go from not ducking, to ducking
 PLAYER.UnDuckSpeed			= 0.3		-- How fast to go from ducking, to not ducking
@@ -47,19 +47,41 @@ function PLAYER:Spawn()
 	self.Player:SetCustomCollisionCheck(true)
 	self.Player:SetRenderMode( RENDERMODE_NONE )
 	self.Player:SetupHands()
-	
+
+	local boxHeight = 24
+	local playerHeight = 30 -- slightly higher than half
+	self.Player:SetViewOffset( 	Vector( 0, 0, playerHeight ) )
+	self.Player:SetViewOffsetDucked( Vector( 0, 0, playerHeight ) )
+
 	-- Prevent 'mod_studio: MOVETYPE_FOLLOW with No Models error.'
 	self.Player:DrawViewModel(false)
 	
 	self.Player.BWBoxEntity = ents.Create("player_box")
-	self.Player.BWBoxEntity:SetPos(self.Player:GetPos())
 	self.Player.BWBoxEntity:SetAngles(self.Player:GetAngles())
-	self.Player.BWBoxEntity:Spawn()
-	self.Player.BWBoxEntity:SetSolid(SOLID_BBOX)
-	self.Player.BWBoxEntity:SetParent(pl)
-	self.Player.BWBoxEntity:SetOwner(pl)
 
+	self.Player.BWBoxEntity:Spawn()
+
+	-- Needs to be after entity is spawned
+	local boxMax = self.Player.BWBoxEntity:OBBMaxs()
+	local boxMin = self.Player.BWBoxEntity:OBBMins()
+
+	self.Player.BWBoxEntity:SetPos(self.Player:GetPos() + Vector(0, 0, -boxMin.z))
+
+	self.Player.BWBoxEntity:SetParent(self.Player)
+	self.Player.BWBoxEntity:SetOwner(self.Player)
+
+	self.Player.BWBoxEntity.health = self.Player:Health()
 	self.Player.BWBoxEntity.max_health = self.Player:GetMaxHealth()
+
+	-- Calculate new player hull slightly smaller than prop
+	local scaling_factor = 0.9
+	local hull_xy_max = math.floor(math.Max(boxMax.x, boxMax.y) * scaling_factor)
+	local hull_xy_min = hull_xy_max * -1
+	local hull_z = math.floor(boxMax.z * scaling_factor)
+	
+	self.Player:SetHull(Vector(hull_xy_min, hull_xy_min, 0), Vector(hull_xy_max, hull_xy_max, hull_z))
+	self.Player:SetHullDuck(Vector(hull_xy_min, hull_xy_min, 0), Vector(hull_xy_max, hull_xy_max, hull_z))
+
 end
 
 

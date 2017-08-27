@@ -7,9 +7,13 @@ include("shared.lua")
 function ENT:Initialize()
 	self:SetModel("models/props_junk/wood_crate001a.mdl")
 
-	self.health = 100
+	self:SetSolid(SOLID_BBOX)
+	self:PhysicsInit( SOLID_VPHYSICS )      -- Make us work with physics,
+	self:SetSolid( SOLID_VPHYSICS )         -- Toolbox
 
-	self.Entity:SetMoveType(MOVETYPE_NONE)
+	self:SetCollisionGroup( COLLISION_GROUP_PLAYER ) -- Collision group for player
+
+	self.Entity:SetMoveType( MOVETYPE_NONE )
 end
 
 -- Called when we take damge

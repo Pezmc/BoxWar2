@@ -2,7 +2,7 @@ include("shared.lua")
 
 -- Called every frame
 function ENT:Draw(flag)
-	local OtherPlayersProp = true --LocalPlayer():BWGetBoxEntity() != self.Entity 
+	local OtherPlayersProp = self:GetOwner() != LocalPlayer() 
 	if (OtherPlayersProp) then
 		self.Entity:DrawModel()
 		self.Entity:DrawShadow(true)
@@ -10,3 +10,4 @@ function ENT:Draw(flag)
 		self.Entity:DrawShadow(false)
 	end
 end 
+
